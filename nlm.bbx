@@ -1,0 +1,323 @@
+\ProvidesFile{nlm.bbx}[2017/01/06 v0.1 NLM style]
+\RequireBibliographyStyle{numeric}
+
+\ExecuteBibliographyOptions{isbn = false}
+\ExecuteBibliographyOptions{doi = false}
+\ExecuteBibliographyOptions{sorting = none}
+
+%% General entry formatting
+
+% do not abbreviate "editors" etc.
+\ExecuteBibliographyOptions{abbreviate = false}
+
+% no italics for titles
+\DeclareFieldFormat*{title}{#1}
+\DeclareFieldFormat*{booktitle}{#1}
+\DeclareFieldFormat*{journaltitle}{#1}
+
+%% general name format
+
+% use initials
+\ExecuteBibliographyOptions{giveninits = true}
+\ExecuteBibliographyOptions{terseinits = true}
+% LAST FS format
+\DeclareNameAlias{sortname}{last-first}
+\DeclareNameAlias{default}{last-first}
+\renewcommand*{\revsdnamepunct}{}
+% show three names before et all
+\ExecuteBibliographyOptions{minbibnames = 3}
+
+%% General date formatting
+
+\ExecuteBibliographyOptions{alldates = long}
+
+% from https://tex.stackexchange.com/questions/347797/
+\DefineBibliographyExtras{english}{%
+  \protected\def\mkbibdatelong#1#2#3{%
+    \iffieldbibstring{#1}
+      {\bibstring{\thefield{#1}}}
+      {\dateeraprintpre{#1}\stripzeros{\thefield{#1}}}%
+    \iffieldundef{#2}
+      {}
+      {\iffieldundef{#1}{}{\space}%
+        \mkbibmonth{\thefield{#2}}%
+        \iffieldundef{#3}{}{\space}}%
+    \iffieldundef{#3}
+      {}
+      {\stripzeros{\thefield{#3}}}}%
+  \protected\gdef\lbx@us@mkdaterangetrunc@long#1#2{%
+    \iffieldundef{#2year}
+      {}
+      {\datecircaprint{}
+       \printtext[#2date]{%
+         \iffieldundef{#2season}
+           {\csuse{mkbibdate#1}{#2year}{#2month}{#2day}%
+            \dateeraprint{#2}}
+           {\csuse{mkbibseasondate#1}{#2year}{#2season}}%
+            \dateeraprint{#2}}%
+         \dateuncertainprint{}
+         \iffieldundef{#2endyear}
+           {}
+           {\iffieldequalstr{#2endyear}{}
+             {\mbox{\bibdaterangesep}}
+             {\bibdaterangesep{}
+              \enddatecircaprint{}
+              \iffieldundef{#2season}
+                {\iffieldsequal{#2year}{#2endyear}
+                  {\iffieldsequal{#2month}{#2endmonth}
+                    {\csuse{mkbibdate#1}{}{}{#2endday}}
+                    {\csuse{mkbibdate#1}{}{#2endmonth}{#2endday}}}
+                  {\csuse{mkbibdate#1}{#2endyear}{#2endmonth}{#2endday}}}
+                {\csuse{mkbibseasondate#1}{#2endyear}{#2endseason}}%
+              \enddateuncertainprint{}
+              \dateeraprint{#2}}}}}
+}
+
+% no periods after month abbreviations
+\DefineBibliographyStrings{english}{%
+  andothers = {asdfasdf},
+  andmore = {sgasdfasdf},
+  january          = {Jan},
+  february         = {Feb},
+  march            = {Mar},
+  april            = {Apr},
+  may              = {May},
+  june             = {Jun},
+  july             = {Jul},
+  august           = {Aug},
+  september        = {Sep},
+  october          = {Oct},
+  november         = {Nov},
+  december         = {Dec}
+}
+
+% always abbreviate page and pages
+\DefineBibliographyStrings{english}{%
+  page = {p\adddot},
+  pages = {p\adddot},
+}
+
+%% General URL formatting
+
+\DeclareFieldFormat{url}{\bibstring{urlfrom}\addcolon\space\url{#1}}
+\DeclareFieldFormat{urldate}{\mkbibbrackets{\midsentence\bibstring{urlseen}\space#1}}
+
+\DefineBibliographyStrings{english}{%
+  urlseen = {cited},
+}
+
+\renewbibmacro*{url+urldate}{%
+  \iffieldundef{urlyear}
+    {}
+    {\usebibmacro{urldate}%
+     \setunit*{\addperiod\addspace}}%
+  \usebibmacro{url}}
+
+%% @inproceedings
+%% @proceedings
+
+\renewbibmacro*{event+venue+date}{%
+  \ifboolexpr{
+    test {\iffieldundef{venue}}
+    and
+    test {\iffieldundef{eventyear}}
+  }
+    {}
+    {\setunit*{\addspace}%
+     \printtext{%
+       \printeventdate}%
+       \setunit*{\addcomma\space}%
+       \printfield{venue}}%
+  \newunit}
+
+\DeclareBibliographyDriver{inproceedings}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/translator+others}%
+  \setunit{\printdelim{nametitledelim}}\newblock
+  \usebibmacro{title}%
+  \newunit
+  \printlist{language}%
+  \newunit\newblock
+  \usebibmacro{byauthor}%
+  \newunit\newblock
+  \usebibmacro{in:}%
+  \usebibmacro{byeditor+others}%
+  \newunit\newblock
+  \usebibmacro{maintitle+booktitle}%
+  \newunit{\addsemicolon}\newblock
+  \usebibmacro{event+venue+date}%
+  \newunit\newblock
+  \iffieldundef{maintitle}
+    {\printfield{volume}%
+     \printfield{part}}
+    {}%
+  \newunit
+  \printfield{volumes}%
+  \newunit\newblock
+  \usebibmacro{series+number}%
+  \newunit\newblock
+  \printfield{note}%
+  \newunit\newblock
+  \printlist{organization}%
+  \newunit
+  \usebibmacro{publisher+location+date}%
+  \newunit\newblock
+  \usebibmacro{chapter+pages}%
+  \newunit\newblock
+  \iftoggle{bbx:isbn}
+    {\printfield{isbn}}
+    {}%
+  \newunit\newblock
+  \usebibmacro{doi+eprint+url}%
+  \newunit\newblock
+  \usebibmacro{addendum+pubstate}%
+  \setunit{\bibpagerefpunct}\newblock
+  \usebibmacro{pageref}%
+  \newunit\newblock
+  \iftoggle{bbx:related}
+    {\usebibmacro{related:init}%
+     \usebibmacro{related}}
+    {}%
+  \usebibmacro{finentry}}
+
+\renewbibmacro*{publisher+location+date}{%
+  \printlist{location}%
+  \iflistundef{publisher}
+    {\setunit*{\addcomma\space}}
+    {\setunit*{\addcolon\space}}%
+  \printlist{publisher}%
+  \setunit*{\addsemicolon\space}%
+  \usebibmacro{date}%
+  \newunit}
+
+%% @article
+
+\DeclareBibliographyDriver{article}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/translator+others}%
+  \setunit{\printdelim{nametitledelim}}\newblock
+  \usebibmacro{title}%
+  \newunit
+  \printlist{language}%
+  \newunit\newblock
+  \usebibmacro{byauthor}%
+  \newunit\newblock
+  \usebibmacro{bytranslator+others}%
+  \newunit\newblock
+  \printfield{version}%
+  \newunit\newblock
+  \usebibmacro{journal+issuetitle+page}%
+  \newunit
+  \usebibmacro{byeditor+others}%
+  \newunit\newblock
+  \iftoggle{bbx:isbn}
+    {\printfield{issn}}
+    {}%
+  \newunit\newblock
+  \usebibmacro{doi+eprint+url}%
+  \newunit\newblock
+  \usebibmacro{addendum+pubstate}%
+  \setunit{\bibpagerefpunct}\newblock
+  \usebibmacro{pageref}%
+  \newunit\newblock
+  \iftoggle{bbx:related}
+    {\usebibmacro{related:init}%
+     \usebibmacro{related}}
+    {}%
+  \usebibmacro{finentry}}
+
+\newbibmacro*{journal+issuetitle+page}{%
+  \usebibmacro{journal}%
+  \setunit*{\addspace}%
+  \iffieldundef{series}
+    {}
+    {\newunit
+     \printfield{series}%
+     \setunit{\addspace}}%
+  \usebibmacro{date}%
+  \setunit{\addsemicolon}%
+  \printfield{volume}%
+  \setunit{}%
+  \printtext[parens]{%
+      \printfield{issue}}%
+  \setunit{\addcolon}%
+  \printfield{pages}%
+  \newunit}
+
+\DeclareFieldFormat[article]{pages}{#1}
+
+%% @online
+
+\DeclareBibliographyDriver{online}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/editor+others/translator+others}%
+  \setunit{\printdelim{nametitledelim}}\newblock
+  \usebibmacro{title}%
+  \newunit
+  \printlist{language}%
+  \newunit\newblock
+  \usebibmacro{byauthor}%
+  \newunit\newblock
+  \usebibmacro{byeditor+others}%
+  \newunit\newblock
+  \printfield{version}%
+  \newunit
+  \printfield{note}%
+  \newunit\newblock
+  \printlist{organization}%
+  \newunit\newblock
+  \usebibmacro{date}%
+  \newunit\newblock
+  \iftoggle{bbx:eprint}
+    {\usebibmacro{eprint}}
+    {}%
+  \newunit\newblock
+  \usebibmacro{url+urldate}%
+  \newunit\newblock
+  \usebibmacro{addendum+pubstate}%
+  \setunit{\bibpagerefpunct}\newblock
+  \usebibmacro{pageref}%
+  \newunit\newblock
+  \iftoggle{bbx:related}
+    {\usebibmacro{related:init}%
+     \usebibmacro{related}}
+    {}%
+  \usebibmacro{finentry}}
+
+%% @software
+
+\DeclareBibliographyDriver{software}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author/editor+others/translator+others}%
+  \setunit{\adddot\addspace}%
+  \usebibmacro{title}%
+  \setunit{\addspace}%
+  \iffieldundef{howpublished}
+    {\printtext[brackets]{\bibstring{software}}}%
+    {\printtext[brackets]{\printfield{howpublished}}}%
+  \setunit{\adddot\addspace}%
+  \printfield{version}%
+  \setunit{\adddot\addspace}%
+  \printlist{language}%
+  \setunit{\adddot\addspace}%
+  \usebibmacro{publisher+location+date}%
+  \setunit{\adddot\addspace}%
+  \iftoggle{bbx:eprint}
+    {\usebibmacro{eprint}}
+    {}%
+  \newunit\newblock%
+  \usebibmacro{url+urldate}%
+  \setunit{\adddot\addspace}%
+  \usebibmacro{addendum+pubstate}%
+  \setunit{\bibpagerefpunct}\newblock%
+  \usebibmacro{pageref}%
+  \newunit\newblock%
+  \usebibmacro{related}%
+  \usebibmacro{finentry}%
+}
+
+\endinput
