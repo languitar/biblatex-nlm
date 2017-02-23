@@ -29,7 +29,7 @@
 
 %% General date formatting
 
-\ExecuteBibliographyOptions{alldates = long}
+\ExecuteBibliographyOptions{alldates = comp}
 
 % from https://tex.stackexchange.com/questions/347797/
 \DefineBibliographyExtras{english}{%
@@ -45,33 +45,34 @@
     \iffieldundef{#3}
       {}
       {\stripzeros{\thefield{#3}}}}%
-  \protected\gdef\lbx@us@mkdaterangetrunc@long#1#2{%
-    \iffieldundef{#2year}
-      {}
-      {\datecircaprint{}
-       \printtext[#2date]{%
-         \iffieldundef{#2season}
-           {\csuse{mkbibdate#1}{#2year}{#2month}{#2day}%
-            \dateeraprint{#2}}
-           {\csuse{mkbibseasondate#1}{#2year}{#2season}}%
-            \dateeraprint{#2}}%
-         \dateuncertainprint{}
-         \iffieldundef{#2endyear}
-           {}
-           {\iffieldequalstr{#2endyear}{}
-             {\mbox{\bibdaterangesep}}
-             {\bibdaterangesep{}
-              \enddatecircaprint{}
-              \iffieldundef{#2season}
-                {\iffieldsequal{#2year}{#2endyear}
-                  {\iffieldsequal{#2month}{#2endmonth}
-                    {\csuse{mkbibdate#1}{}{}{#2endday}}
-                    {\csuse{mkbibdate#1}{}{#2endmonth}{#2endday}}}
-                  {\csuse{mkbibdate#1}{#2endyear}{#2endmonth}{#2endday}}}
-                {\csuse{mkbibseasondate#1}{#2endyear}{#2endseason}}%
-              \enddateuncertainprint{}
-              \dateeraprint{#2}}}}}
-}
+%
+\protected\gdef\lbx@us@mkdaterangetrunc@long#1#2{%
+  \iffieldundef{#2year}
+    {}
+    {\datecircaprint
+     \printtext[#2date]{%
+       \iffieldundef{#2season}
+         {\csuse{mkbibdate#1}{#2year}{#2month}{#2day}%
+          \dateeraprint{#2}}
+         {\csuse{mkbibseasondate#1}{#2year}{#2season}}%
+          \dateeraprint{#2}}%
+       \dateuncertainprint
+       \iffieldundef{#2endyear}
+         {}
+         {\iffieldequalstr{#2endyear}{}
+           {\mbox{\bibdaterangesep}}
+           {\bibdaterangesep
+            \enddatecircaprint
+            \iffieldundef{#2season}
+              {\iffieldsequal{#2year}{#2endyear}
+                {\iffieldsequal{#2month}{#2endmonth}
+                  {\csuse{mkbibdate#1}{}{}{#2endday}}
+                  {\csuse{mkbibdate#1}{}{#2endmonth}{#2endday}}}
+                {\csuse{mkbibdate#1}{#2endyear}{#2endmonth}{#2endday}}}
+              {\csuse{mkbibseasondate#1}{#2endyear}{#2endseason}}%
+            \enddateuncertainprint
+            \dateeraprint{#2}}}}}%
+ }%
 
 % no periods after month abbreviations
 \DefineBibliographyStrings{english}{%
