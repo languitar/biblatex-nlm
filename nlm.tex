@@ -1,0 +1,18 @@
+\documentclass{article}
+
+\usepackage[style=nlm,backend=biber]{biblatex}
+\DeclareSourcemap{
+  \maps[datatype=bibtex]{
+    \map{
+       \step[fieldset=abstract, null]
+       \step[fieldset=pagetotal, null]
+    }
+  }
+}
+
+\bibliography{nlm}
+
+\begin{document}
+\nocite{*}
+\printbibliography{}
+\end{document}
